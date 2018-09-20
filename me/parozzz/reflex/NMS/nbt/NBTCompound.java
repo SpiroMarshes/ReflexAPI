@@ -5,9 +5,15 @@ import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.NBTTagList;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class NBTCompound implements NBT<NBTTagCompound>
 {
+    public static NBTCompound getNew()
+    {
+        return new NBTCompound().setCompound(new NBTTagCompound());
+    }
+
     private NBTTagCompound tag;
 
     public NBTCompound(final NBTTagCompound compound)
@@ -17,11 +23,6 @@ public class NBTCompound implements NBT<NBTTagCompound>
 
     protected NBTCompound()
     {
-    }
-
-    public static NBTCompound getNew()
-    {
-        return new NBTCompound().setCompound(new NBTTagCompound());
     }
 
     protected final NBTCompound setCompound(final NBTTagCompound tag)
@@ -35,9 +36,9 @@ public class NBTCompound implements NBT<NBTTagCompound>
         tag.set(key, nbt);
     }
 
-    public void setCompound(final String key, final NBTCompound compound)
+    public final void setNBT(String key, NBT nbt)
     {
-        tag.set(key, compound.getBase());
+        this.set(key, nbt.getBase());
     }
 
     public final NBTCompound setBoolean(final String key, final boolean value)
@@ -153,6 +154,16 @@ public class NBTCompound implements NBT<NBTTagCompound>
     public final NBTTagCompound getCompound(final String key)
     {
         return tag.getCompound(key);
+    }
+
+    public final void setUUID(String key, UUID uuid)
+    {
+        tag.a(key, uuid);
+    }
+
+    public final UUID getUUID(String key)
+    {
+        return tag.a(key);
     }
 
     /**

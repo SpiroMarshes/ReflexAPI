@@ -6,6 +6,11 @@ import javax.annotation.Nullable;
 
 public class NBTList implements NBT<NBTTagList>
 {
+    public static NBTList createNew()
+    {
+        return new NBTList(new NBTTagList());
+    }
+
     private final NBTTagList list;
     private NBTType type;
 
@@ -107,14 +112,38 @@ public class NBTList implements NBT<NBTTagList>
         list.add(nbt.getBase());
     }
 
-    public void setNBT(final int index, final NBT nbt)
+    public void add(NBTBase nbtBase)
     {
-        list.a(index, nbt.getBase());
+        list.add(nbtBase);
     }
 
-    public void remove(final int index)
+    public void setNBT(final int index, final NBT nbt)
     {
-        list.remove(index);
+        this.set(index, nbt.getBase());
+    }
+
+    public void set(int index, NBTBase nbtBase)
+    {
+        list.a(index, nbtBase);
+    }
+
+    public NBTBase remove(final int index)
+    {
+        return list.remove(index);
+    }
+
+    @Nullable
+    public NBTCompound removeCompound(int index)
+    {
+        NBTBase nbtBase = this.remove(index);
+        return nbtBase instanceof NBTTagCompound ? new NBTCompound((NBTTagCompound) nbtBase) : null;
+    }
+
+    @Nullable
+    public NBTList removeList(int index)
+    {
+        NBTBase nbtBase = this.remove(index);
+        return nbtBase instanceof NBTTagList ? new NBTList((NBTTagList) nbtBase) : null;
     }
 
     public boolean isEmpty()
@@ -137,8 +166,8 @@ public class NBTList implements NBT<NBTTagList>
         return new NBTCompound(getCompound(index));
     }
 
-    public @Nullable
-    NBTList getWrappedList(final int index)
+    @Nullable
+    public NBTList getWrappedList(final int index)
     {
         NBTTagList localList = getList(index);
         return localList != null ? new NBTList(localList) : null;
