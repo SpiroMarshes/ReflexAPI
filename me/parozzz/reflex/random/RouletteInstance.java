@@ -11,8 +11,6 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 import me.parozzz.reflex.MCVersion;
-import me.parozzz.reflex.NMS.itemStack.NMSStack;
-import me.parozzz.reflex.NMS.nbt.NBTCompound;
 import me.parozzz.reflex.builders.FireworkBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;

@@ -1,0 +1,8 @@
+In Item Creation:
+  - In potion meta -> "effect" to "effects"
+  - In normal meta -> "flag" to "item_flags"
+  - In normal meta -> "enchant" to "enchants"
+  - In itemStack -> "id" to "material"
+  - Removed spawn egg (No needed, since 1.13 has spawn eggs as peculiar materials)
+  - Removed data from all the items, only for tools. In Damageable meta -> "data" to "damage".
+  - Added repair cost. In repairable meta -> "repair_cost"

@@ -1,238 +1,237 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package me.parozzz.reflex.NMS.nbt;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import net.minecraft.server.v1_13_R2.NBTBase;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.NBTTagList;
+
 import java.util.Set;
-import me.parozzz.reflex.Debug;
-import me.parozzz.reflex.MCVersion;
-import me.parozzz.reflex.NMS.ReflectionUtil;
 
-/**
- *
- * @author Paros
- */
-public class NBTCompound extends NBTBase
+public class NBTCompound implements NBT<NBTTagCompound>
 {
-    private final static Class<?> compoundClazz;
-    private final static Constructor<?> constructor;
-    
-    private final static Method parseStringMethod;
-    
-    private final static Method setNBTMethod;
-    private final static Method keySetMethod;
-    private final static Method getTypeByKeyMethod;
-    private final static Method hasKeyMethod;
-    private final static Method hasKeyOfTypeMethod;
-    private final static Method removeKeyMethod;
-    static
+    private NBTTagCompound tag;
+
+    public NBTCompound(final NBTTagCompound compound)
     {
-        Class<?> mojangsonParserClazz = ReflectionUtil.getNMSClass("MojangsonParser");
-        parseStringMethod = ReflectionUtil.getMethod(mojangsonParserClazz, "parse", String.class);
-        
-        compoundClazz = ReflectionUtil.getNMSClass("NBTTagCompound");
-        constructor = ReflectionUtil.getConstructor(compoundClazz);
-        
-        setNBTMethod = ReflectionUtil.getMethod(compoundClazz, "set", String.class, NBTBase.getNMSClass()); 
-        keySetMethod = ReflectionUtil.getMethod(compoundClazz, "c");
-        getTypeByKeyMethod = ReflectionUtil.getMethod(compoundClazz, MCVersion.V1_8.isEqual()? "b" : "d", String.class); 
-        hasKeyMethod = ReflectionUtil.getMethod(compoundClazz, "hasKey", String.class); //Checker
-        hasKeyOfTypeMethod = ReflectionUtil.getMethod(compoundClazz, "hasKeyOfType", String.class, int.class);
-        removeKeyMethod = ReflectionUtil.getMethod(compoundClazz, "remove", String.class); //Removed
-    }
-    
-    public static Object getNewNMSCompound()
-    {
-        return Debug.validateConstructor(constructor);
-    }
-    
-    public static Class<?> getNMSClass()
-    {
-        return compoundClazz;
-    }
-    
-    public NBTCompound()
-    {
-        super(Debug.validateConstructor(constructor));
+        tag = compound;
     }
 
-    public NBTCompound(final Object compound) 
+    protected NBTCompound()
     {
-        super(compound);
     }
 
-    public NBTCompound(final String str)
+    public static NBTCompound getNew()
     {
-        super(Debug.validateMethod(parseStringMethod, null, str));
+        return new NBTCompound().setCompound(new NBTTagCompound());
     }
-    
-    private <T> T getKey(final String key, final NBTType type)
+
+    protected final NBTCompound setCompound(final NBTTagCompound tag)
     {
-        return (T) Debug.validateMethod(type.getCompoundGetter(), super.nbtBase, key);
-    }
-    
-    private void setKey(final String key, final NBTType type, final Object value)
-    { 
-        Debug.validateMethod(type.getCompoundSetter(), super.nbtBase, key, value);
-    }
-    
-    public NBTCompound setBoolean(final String key, final boolean value)
-    {
-        setByte(key, (byte)(value ? 1 : 0));
+        this.tag = tag;
         return this;
     }
-    
-    public boolean getBoolean(final String key)
+
+    public final void set(final String key, final NBTBase nbt)
+    {
+        tag.set(key, nbt);
+    }
+
+    public void setCompound(final String key, final NBTCompound compound)
+    {
+        tag.set(key, compound.getBase());
+    }
+
+    public final NBTCompound setBoolean(final String key, final boolean value)
+    {
+        setByte(key, (byte) (value ? 1 : 0));
+        return this;
+    }
+
+    public final boolean getBoolean(final String key)
     {
         return getByte(key) != 0;
     }
-    
-    public NBTCompound setByte(final String key, final byte value)
+
+    public final NBTCompound setByte(final String key, final byte value)
     {
-        setKey(key, NBTType.BYTE, value);
+        tag.setByte(key, value);
         return this;
-    }
-    
-    public byte getByte(final String key)
-    {
-        return (byte) getKey(key, NBTType.BYTE);
-    }
-    
-    public NBTCompound setByteArray(final String key, final byte[] value)
-    {
-        setKey(key, NBTType.BYTEARRAY, value);
-        return this;
-    }
-    
-    public byte[] getByteArray(final String key)
-    {
-        return (byte[]) getKey(key, NBTType.BYTEARRAY);
-    }
-    
-    public NBTCompound setShort(final String key, final short value)
-    {
-        setKey(key, NBTType.SHORT, value);
-        return this;
-    }
-    
-    public short getShort(final String key)
-    {
-        return (short) getKey(key, NBTType.SHORT);
-    }
-    
-    public NBTCompound setInt(final String key, final int value)
-    {
-        setKey(key, NBTType.INT, value);
-        return this;
-    }
-    
-    public int getInt(final String key)
-    {
-        return (int) getKey(key, NBTType.INT);
-    }
-    
-    public NBTCompound setIntArray(final String key, final int[] value)
-    {
-        setKey(key, NBTType.INTARRAY, value);
-        return this;
-    }
-    
-    public int[] getIntArray(final String key)
-    {
-        return (int[]) getKey(key, NBTType.INTARRAY);
-    }
-    
-    public NBTCompound setLong(final String key, final long value)
-    {
-        setKey(key, NBTType.LONG, value);
-        return this;
-    }
-    
-    public long getLong(final String key)
-    {
-        return (long) getKey(key, NBTType.LONG);
-    }
-    
-    public NBTCompound setFloat(final String key, final float value)
-    {
-        setKey(key, NBTType.FLOAT, value);
-        return this;
-    }
-    
-    public float getFloat(final String key)
-    {
-        return (float) getKey(key, NBTType.FLOAT);
-    }
-    
-    public NBTCompound setDouble(final String key, final double value)
-    {
-        setKey(key, NBTType.DOUBLE, value);
-        return this;
-    }
-    
-    public double getDouble(final String key)
-    {
-        return (double) getKey(key, NBTType.DOUBLE);
-    }
-    
-    public NBTCompound setString(final String key, final String value)
-    {
-        setKey(key, NBTType.STRING, value);
-        return this;
-    }
-    
-    public String getString(final String key)
-    {
-        return (String) getKey(key, NBTType.STRING);
-    }
-    
-    public NBTCompound getCompound(final String key)
-    {
-        return new NBTCompound(Debug.validateMethod(NBTType.COMPOUND.getCompoundGetter(), super.nbtBase, key));
-    }
-    
-    public NBTList getList(final String key, final NBTType type)
-    {
-        return new NBTList(Debug.validateMethod(NBTType.LIST.getCompoundGetter(), super.nbtBase, key, (int)type.getId()));
-    }
-    
-    public void removeKey(final String key)
-    {
-        Debug.validateMethod(removeKeyMethod, super.nbtBase, key);
-    }
-    
-    public void setTag(final String key, final NBTBase nbt)
-    {
-        Debug.validateMethod(setNBTMethod, super.nbtBase, key, nbt.getNMSObject());
     }
 
-    public boolean hasKey(final String key)
+    public final byte getByte(final String key)
     {
-        return (boolean)Debug.validateMethod(hasKeyMethod, super.nbtBase, key);
+        return tag.getByte(key);
     }
 
-    public NBTType getTypeByKey(final String key)
+    public final NBTCompound setByteArray(final String key, final byte[] value)
     {
-        return NBTType.getById((byte)Debug.validateMethod(getTypeByKeyMethod, super.nbtBase, key));
+        tag.setByteArray(key, value);
+        return this;
     }
 
-    public boolean hasKeyOfType(final String key, final NBTType type)
+    public final byte[] getByteArray(final String key)
     {
-        return (boolean)Debug.validateMethod(hasKeyOfTypeMethod, super.nbtBase, key, type.getId());
+        return tag.getByteArray(key);
     }
 
-    public Set<String> keySet()
+    public final NBTCompound setShort(final String key, final short value)
     {
-        return (Set<String>)Debug.validateMethod(keySetMethod, super.nbtBase);
+        tag.setShort(key, value);
+        return this;
     }
-    
+
+    public final short getShort(final String key)
+    {
+        return tag.getShort(key);
+    }
+
+    public final NBTCompound setInt(final String key, final int value)
+    {
+        tag.setInt(key, value);
+        return this;
+    }
+
+    public final int getInt(final String key)
+    {
+        return tag.getInt(key);
+    }
+
+    public final NBTCompound setIntArray(final String key, final int[] value)
+    {
+        tag.setIntArray(key, value);
+        return this;
+    }
+
+    public final int[] getIntArray(final String key)
+    {
+        return tag.getIntArray(key);
+    }
+
+    public final NBTCompound setLong(final String key, final long value)
+    {
+        tag.setLong(key, value);
+        return this;
+    }
+
+    public final long getLong(final String key)
+    {
+        return tag.getLong(key);
+    }
+
+    public final NBTCompound setFloat(final String key, final float value)
+    {
+        tag.setFloat(key, value);
+        return this;
+    }
+
+    public final float getFloat(final String key)
+    {
+        return tag.getFloat(key);
+    }
+
+    public final NBTCompound setDouble(final String key, final double value)
+    {
+        tag.setDouble(key, value);
+        return this;
+    }
+
+    public final double getDouble(final String key)
+    {
+        return tag.getDouble(key);
+    }
+
+    public final NBTCompound setString(final String key, final String value)
+    {
+        tag.setString(key, value);
+        return this;
+    }
+
+    public final String getString(final String key)
+    {
+        return tag.getString(key);
+    }
+
+    public final NBTTagCompound getCompound(final String key)
+    {
+        return tag.getCompound(key);
+    }
+
+    /**
+     * This value won't need to reapply the NBTTagCompound, since it does it automatically
+     *
+     * @param key The key parameter for the main NBTTagCompound
+     * @return The wrapped NBTTagCompound from the main NBTTagCompound
+     */
+    public final NBTCompound getWrappedCompound(final String key)
+    {
+        NBTTagCompound compound = tag.getCompound(key);
+        if(!tag.hasKeyOfType(key, NBTType.COMPOUND.getId()))
+        {
+            tag.set(key, compound);
+        }
+        return new NBTCompound(compound);
+    }
+
+    public final NBTTagList getList(final String key, final NBTType type)
+    {
+        return tag.getList(key, type.getId());
+    }
+
+    public final NBTList getWrapperList(final String key, final NBTType type)
+    {
+        NBTTagList list = tag.getList(key, type.getId());
+        if(!tag.hasKeyOfType(key, NBTType.LIST.getId()))
+        {
+            tag.set(key, list);
+        }
+        return new NBTList(list, type);
+    }
+
+    public final NBTCompound removeKey(final String key)
+    {
+        tag.remove(key);
+        return this;
+    }
+
+    public final boolean hasKey(final String key)
+    {
+        return tag.hasKey(key);
+    }
+
+    public final boolean hasKeyOfType(final String key, final NBTType type)
+    {
+        return tag.hasKeyOfType(key, type.getId());
+    }
+
+    public final Set<String> keySet()
+    {
+        return tag.getKeys();
+    }
+
+    public boolean isEmpty()
+    {
+        return tag.isEmpty();
+    }
+
+    public final int size()
+    {
+        return tag.d();
+    }
+
     @Override
-    public NBTCompound clone()
+    public String toString()
     {
-        return new NBTCompound(this.nbtBase);
+        return tag.toString();
+    }
+
+    @Override
+    public final NBTTagCompound getBase()
+    {
+        return tag;
+    }
+
+    @Override
+    public final NBTType getType()
+    {
+        return NBTType.COMPOUND;
     }
 }

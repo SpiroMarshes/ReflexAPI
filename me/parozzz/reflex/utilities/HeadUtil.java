@@ -7,29 +7,30 @@ package me.parozzz.reflex.utilities;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import java.lang.reflect.Field;
-import java.util.Base64;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import me.parozzz.reflex.NMS.ReflectionUtil;
+import me.parozzz.reflex.tools.Validator;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Field;
+import java.util.Base64;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
- *
  * @author Paros
  */
-public class HeadUtil 
+public class HeadUtil
 {
     public interface Headable
     {
-        public String getUrl();
-        public ItemStack getHead();
+        String getUrl();
+
+        ItemStack getHead();
     }
-    
+
     public static enum MobHead implements Headable
     {
         BAT("http://textures.minecraft.net/texture/382fc3f71b41769376a9e92fe3adbaac3772b999b219c9d6b4680ba9983e527"),
@@ -81,57 +82,56 @@ public class HeadUtil
         ZOMBIE_HORSE("http://textures.minecraft.net/texture/d22950f2d3efddb18de86f8f55ac518dce73f12a6e0f8636d551d8eb480ceec"),
         ZOMBIE_VILLAGER("http://textures.minecraft.net/texture/37e838ccc26776a217c678386f6a65791fe8cdab8ce9ca4ac6b28397a4d81c22"),
         WITHER("http://textures.minecraft.net/texture/cdf74e323ed41436965f5c57ddf2815d5332fe999e68fbb9d6cf5c8bd4139f");
-            
+
         private final ItemStack head;
         private final String url;
-        private MobHead(final String url) 
+
+        MobHead(final String url)
         {
             this.url = url;
-            head = createHead(url); 
+            head = createHead(url);
         }
-        
+
         @Override
         public String getUrl()
         {
             return url;
         }
-        
+
         @Override
         public ItemStack getHead()
         {
-            return head.clone(); 
+            return head.clone();
         }
     }
-    
+
     public static ItemStack createHead(final String url)
     {
-        return addTexture(new ItemStack(Material.SKULL_ITEM, 1, (short)3), url);
+        return addTexture(new ItemStack(Material.PLAYER_HEAD), url);
     }
-    
-    public static ItemStack addTexture(final ItemStack item, final String url)
+
+    public static ItemStack addTexture(final ItemStack itemStack, final String url)
     {
-        ItemMeta meta = item.getItemMeta();
+        ItemMeta meta = itemStack.getItemMeta();
         if(!SkullMeta.class.isInstance(meta))
         {
             throw new UnsupportedOperationException("Trying to add a skull texture to a non-playerhead item");
         }
-        
-        addTexture((SkullMeta)meta, url);
-        item.setItemMeta(meta);
-        return item;
+
+        setTexture((SkullMeta) meta, url);
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
-    
-    public static void addTexture(final SkullMeta meta, final String url)
+
+    public static void setTexture(final SkullMeta meta, final String url)
     {
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        profile.getProperties().put("textures", new Property("textures", new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", new Object[] { url }).getBytes()))));
- 
-        try {
-            Field profileField = ReflectionUtil.getField(meta.getClass(), "profile");
-            profileField.set(meta, profile);
-            profileField.setAccessible(false);
-        } catch (IllegalArgumentException | IllegalAccessException ex) {
-            Logger.getLogger(HeadUtil.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
+        Property property = new Property("textures",
+                new String(Base64.getEncoder().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", new Object[]{url}).getBytes())));
+        profile.getProperties().put("textures", property);
+
+        Field gameProfileField = ReflectionUtil.getField(meta.getClass(), "profile");
+        Validator.validateField(gameProfileField, profile);
     }
 }

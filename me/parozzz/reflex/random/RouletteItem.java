@@ -11,8 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import me.parozzz.reflex.NMS.itemStack.NMSStack;
-import me.parozzz.reflex.NMS.nbt.NBTCompound;
+
 import me.parozzz.reflex.utilities.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

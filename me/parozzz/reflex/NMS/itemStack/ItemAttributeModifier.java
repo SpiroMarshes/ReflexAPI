@@ -12,9 +12,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import me.parozzz.reflex.NMS.nbt.NBTCompound;
-import me.parozzz.reflex.NMS.nbt.NBTList;
-import me.parozzz.reflex.NMS.nbt.NBTType;
 
 /**
  *

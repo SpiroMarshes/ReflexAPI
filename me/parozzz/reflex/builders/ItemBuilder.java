@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import me.parozzz.reflex.MCVersion;
-import me.parozzz.reflex.NMS.itemStack.NMSStack;
 import me.parozzz.reflex.utilities.ItemUtil;
 import org.bukkit.Color;
 import org.bukkit.Material;

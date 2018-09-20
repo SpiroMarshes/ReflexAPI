@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import me.parozzz.reflex.MCVersion;
 import me.parozzz.reflex.NMS.ReflectionUtil;
 import me.parozzz.reflex.NMS.entity.EntityPlayer;
-import me.parozzz.reflex.NMS.itemStack.NMSStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
