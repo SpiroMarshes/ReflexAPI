@@ -5,12 +5,13 @@
  */
 package me.parozzz.reflex.items;
 
-import me.parozzz.reflex.NMS.nbt.NBTCompound;
-import me.parozzz.reflex.NMS.nbt.NBTType;
+import me.parozzz.reflex.nms.nbt.NBTCompound;
+import me.parozzz.reflex.nms.nbt.NBTType;
 import me.parozzz.reflex.tools.Validator;
 import me.parozzz.reflex.utilities.ReflectionUtil;
 import me.parozzz.reflex.utilities.Util;
 import net.minecraft.server.v1_13_R2.*;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
@@ -226,7 +227,7 @@ public class NMSStackCompound extends NBTCompound
         wrapper.set("Lore", getLoreTagList(loreList));
     }
 
-    // Copied from NMS ItemStack
+    // Copied from nms ItemStack
     public void addEnchant(final org.bukkit.enchantments.Enchantment enchantment, final int level)
     {
         NBTTagList enchantList;
@@ -256,7 +257,7 @@ public class NMSStackCompound extends NBTCompound
         enchantList.add(localEnchantCompound);
     }
 
-    // Copied from NMS ItemStack
+    // Copied from nms ItemStack
     public Map<org.bukkit.enchantments.Enchantment, Integer> getEnchantments()
     {
         Map<org.bukkit.enchantments.Enchantment, Integer> map = new HashMap<>();
@@ -284,7 +285,7 @@ public class NMSStackCompound extends NBTCompound
         return map;
     }
 
-    // Copied from NMS ItemStack
+    // Copied from nms ItemStack
     public void removeEnchant(final org.bukkit.enchantments.Enchantment enchantment)
     {
         if(!hasKeyOfType("ench", NBTType.LIST))
@@ -435,6 +436,22 @@ public class NMSStackCompound extends NBTCompound
     public ItemStack getNMSStack()
     {
         return nmsStack;
+    }
+
+    public NBTCompound saveNMSItemStack(final NBTCompound compound)
+    {
+        Validate.notNull(compound);
+
+        if(!isAir())
+        {
+            nmsStack.save(compound.getBase());
+        }
+        return compound;
+    }
+
+    public NBTCompound saveNMSItemStack()
+    {
+        return saveNMSItemStack(NBTCompound.getNew());
     }
 
     @Override

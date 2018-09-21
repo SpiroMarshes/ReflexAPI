@@ -1,4 +1,4 @@
-package me.parozzz.reflex.NMS.nbt;
+package me.parozzz.reflex.nms.nbt;
 
 public enum NBTType
 {

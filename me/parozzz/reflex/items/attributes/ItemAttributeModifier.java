@@ -5,12 +5,10 @@
  */
 package me.parozzz.reflex.items.attributes;
 
-import me.parozzz.reflex.NMS.nbt.NBTCompound;
-import me.parozzz.reflex.NMS.nbt.NBTList;
-import me.parozzz.reflex.NMS.nbt.NBTType;
+import me.parozzz.reflex.nms.nbt.NBTCompound;
+import me.parozzz.reflex.nms.nbt.NBTList;
+import me.parozzz.reflex.nms.nbt.NBTType;
 import me.parozzz.reflex.items.NMSStackCompound;
-import net.minecraft.server.v1_13_R2.NBTBase;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
 
 import javax.annotation.Nullable;
 import java.util.Set;

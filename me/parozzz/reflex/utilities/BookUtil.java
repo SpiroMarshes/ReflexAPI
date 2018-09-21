@@ -12,8 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import me.parozzz.reflex.MCVersion;
-import me.parozzz.reflex.NMS.ReflectionUtil;
-import me.parozzz.reflex.NMS.entity.EntityPlayer;
+import me.parozzz.reflex.nms.entity.EntityPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 

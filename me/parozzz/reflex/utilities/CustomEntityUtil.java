@@ -1000,7 +1000,7 @@ public class CustomEntityUtil {
 		}
 
 		/**
-		 * Returns the NMS name of the attribute. For example, <code>MAX_HEALTH</code> returns
+		 * Returns the nms name of the attribute. For example, <code>MAX_HEALTH</code> returns
 		 * <code>"generic.maxHealth"</code>, and so on and so forth.
 		 *
 		 * @return The name as a String.

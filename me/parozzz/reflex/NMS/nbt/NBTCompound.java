@@ -1,4 +1,4 @@
-package me.parozzz.reflex.NMS.nbt;
+package me.parozzz.reflex.nms.nbt;
 
 import net.minecraft.server.v1_13_R2.NBTBase;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
@@ -25,7 +25,7 @@ public class NBTCompound implements NBT<NBTTagCompound>
     {
     }
 
-    protected final NBTCompound setCompound(final NBTTagCompound tag)
+    public final NBTCompound setCompound(final NBTTagCompound tag)
     {
         this.tag = tag;
         return this;
@@ -187,7 +187,7 @@ public class NBTCompound implements NBT<NBTTagCompound>
         return tag.getList(key, type.getId());
     }
 
-    public final NBTList getWrapperList(final String key, final NBTType type)
+    public final NBTList getWrappedList(final String key, final NBTType type)
     {
         NBTTagList list = tag.getList(key, type.getId());
         if(!tag.hasKeyOfType(key, NBTType.LIST.getId()))
