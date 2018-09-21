@@ -1,3 +1,5 @@
 name: ReflexAPI
 version: 1.2
 main: me.parozzz.reflex.ReflexAPI
+
+api-version: 1.13

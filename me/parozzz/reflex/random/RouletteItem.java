@@ -12,6 +12,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import me.parozzz.reflex.items.NMSStackCompound;
+import me.parozzz.reflex.nms.nbt.NBTCompound;
+import me.parozzz.reflex.nms.nbt.NBTList;
+import me.parozzz.reflex.nms.nbt.NBTType;
 import me.parozzz.reflex.utilities.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -27,7 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Paros
  */
 public class RouletteItem 
-{
+{/*
     private static boolean REGISTERED = false;
     public static void registerListener()
     {
@@ -72,7 +76,7 @@ public class RouletteItem
         Util.ifCheck(!REGISTERED, () -> registerListener());
         
         this.item = item;
-        tag = new NMSStack(item).getTag();
+        tag = new NMSStackCompound(item);
     }
     
     public boolean isValid()
@@ -82,15 +86,15 @@ public class RouletteItem
     
     public void start(final Player p)
     {
-        NBTCompound compound = tag.getCompound(COMPOUND);
+        NBTCompound compound = tag.getWrappedCompound(COMPOUND);
         
         UUID u = UUID.randomUUID();
 
-        new RouletteInstance(p, u, item, compound.keySet().stream().map(compound::getCompound).flatMap(random -> 
+        new RouletteInstance(p, u, item, compound.keySet().stream().filter(compound::hasKey).map(compound::getWrappedCompound).flatMap(random ->
         {
-            NMSStack nbt = new NMSStack(random.getCompound(ITEM));
-            nbt.getTag().setString(UID, u.toString());
-            return Collections.nCopies(random.getInt(CHANCE), nbt.getBukkitItem()).stream();
+            NMSStackCompound stack = new NMSStackCompound(random.getWrappedCompound(ITEM));
+            stack.setString(UID, u.toString());
+            return Collections.nCopies(random.getInt(CHANCE), stack.getItemStack()).stream();
         }).collect(Collectors.toList()));
     }
     
@@ -99,24 +103,21 @@ public class RouletteItem
     
     public static ItemStack createRandom(final ItemStack item, final Map<ItemStack, Integer> map)
     {
-        NMSStack nbt = new NMSStack(item);
-        NBTCompound tag = nbt.getTag();
-        
-        NBTCompound randomCompound = new NBTCompound();
+        NMSStackCompound stack = new NMSStackCompound(item);
+
+        NBTList randomList = stack.getWrappedList(COMPOUND, NBTType.COMPOUND);
+
         int key = 0;
         for(Map.Entry<ItemStack, Integer> e : map.entrySet())
         {
-            NBTCompound compound = new NBTCompound();
+            NBTCompound compound = NBTCompound.getNew();
             compound.setInt(CHANCE, e.getValue());
-            
-            compound.setTag(ITEM,  new NMSStack(e.getKey()).convertToNBT());
-            
-            randomCompound.setTag(Objects.toString(key++), compound);
+
+            compound.setNBT(ITEM,  new NMSStackCompound(e.getKey()).saveNMSItemStack());
+
+            randomList.addNBT(compound);
         }
         
-        //tag.setValue(UID, NBTType.STRING, u.toString());
-        tag.setTag(COMPOUND, randomCompound);
-        
-        return nbt.getBukkitItem();
-    }
+        return stack.getItemStack();
+    }*/
 }

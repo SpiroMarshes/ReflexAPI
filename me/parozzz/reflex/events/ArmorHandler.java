@@ -5,44 +5,14 @@
  */
 package me.parozzz.reflex.events;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 import me.parozzz.reflex.events.armor.ArmorEquipEvent;
 import me.parozzz.reflex.events.armor.ArmorUnequipEvent;
 import me.parozzz.reflex.events.armor.ArmorUnequipEvent.Cause;
 import me.parozzz.reflex.utilities.Util;
 import org.bukkit.Material;
-import static org.bukkit.Material.CHAINMAIL_BOOTS;
-import static org.bukkit.Material.CHAINMAIL_CHESTPLATE;
-import static org.bukkit.Material.CHAINMAIL_HELMET;
-import static org.bukkit.Material.CHAINMAIL_LEGGINGS;
-import static org.bukkit.Material.DIAMOND_BOOTS;
-import static org.bukkit.Material.DIAMOND_CHESTPLATE;
-import static org.bukkit.Material.DIAMOND_HELMET;
-import static org.bukkit.Material.DIAMOND_LEGGINGS;
-import static org.bukkit.Material.GOLD_BOOTS;
-import static org.bukkit.Material.GOLD_CHESTPLATE;
-import static org.bukkit.Material.GOLD_HELMET;
-import static org.bukkit.Material.GOLD_LEGGINGS;
-import static org.bukkit.Material.IRON_BOOTS;
-import static org.bukkit.Material.IRON_CHESTPLATE;
-import static org.bukkit.Material.IRON_HELMET;
-import static org.bukkit.Material.IRON_LEGGINGS;
-import static org.bukkit.Material.LEATHER_BOOTS;
-import static org.bukkit.Material.LEATHER_CHESTPLATE;
-import static org.bukkit.Material.LEATHER_HELMET;
-import static org.bukkit.Material.LEATHER_LEGGINGS;
-import static org.bukkit.Material.PUMPKIN;
-import static org.bukkit.Material.SKULL_ITEM;
 import org.bukkit.block.Block;
 import org.bukkit.block.Jukebox;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -54,43 +24,51 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.*;
+import java.util.stream.Stream;
+
+import static org.bukkit.Material.*;
 
 /**
- *
  * @author Paros
  */
 public class ArmorHandler implements Listener
 {
     private final static EnumMap<Material, Armor> armors = new EnumMap(Material.class);
+
     private final static Map<Integer, EquipmentSlot> slots = new HashMap<>();
     private final static Map<Integer, EquipmentSlot> rawSlots = new HashMap<>();
-    
+
+    private final static EnumSet<Material> HEADS = EnumSet.of(DRAGON_HEAD, PLAYER_HEAD, ZOMBIE_HEAD, CREEPER_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL);
+
     private final static Set<Material> clickable = EnumSet.noneOf(Material.class);
     static
     {
-        slots.put(39, EquipmentSlot.HEAD); 
-        slots.put(38, EquipmentSlot.CHEST); 
-        slots.put(37, EquipmentSlot.LEGS); 
+        slots.put(39, EquipmentSlot.HEAD);
+        slots.put(38, EquipmentSlot.CHEST);
+        slots.put(37, EquipmentSlot.LEGS);
         slots.put(36, EquipmentSlot.FEET);
-        
-        rawSlots.put(5, EquipmentSlot.HEAD); 
-        rawSlots.put(6, EquipmentSlot.CHEST); 
-        rawSlots.put(7, EquipmentSlot.LEGS); 
+
+        rawSlots.put(5, EquipmentSlot.HEAD);
+        rawSlots.put(6, EquipmentSlot.CHEST);
+        rawSlots.put(7, EquipmentSlot.LEGS);
         rawSlots.put(8, EquipmentSlot.FEET);
-        
-        Stream.of(LEATHER_HELMET, CHAINMAIL_HELMET, GOLD_HELMET, IRON_HELMET, DIAMOND_HELMET, SKULL_ITEM, PUMPKIN).forEach(m -> armors.put(m, new Armor(39, EquipmentSlot.HEAD)));
-        Stream.of(LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, GOLD_CHESTPLATE, IRON_CHESTPLATE, DIAMOND_CHESTPLATE).forEach(m -> armors.put(m, new Armor(38, EquipmentSlot.CHEST)));
-        Stream.of(LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, GOLD_LEGGINGS, IRON_LEGGINGS, DIAMOND_LEGGINGS).forEach(m -> armors.put(m, new Armor(37, EquipmentSlot.LEGS)));
-        Stream.of(LEATHER_BOOTS, CHAINMAIL_BOOTS, GOLD_BOOTS, IRON_BOOTS, DIAMOND_BOOTS).forEach(m -> armors.put(m, new Armor(36, EquipmentSlot.FEET)));
-    
-        Stream.of(Material.values()).forEach(m -> 
+
+        Stream.of(LEATHER_HELMET, CHAINMAIL_HELMET, GOLDEN_HELMET, IRON_HELMET, DIAMOND_HELMET, DRAGON_HEAD, SKELETON_SKULL, WITHER_SKELETON_SKULL, ZOMBIE_HEAD,
+                CREEPER_HEAD, PLAYER_HEAD, PUMPKIN).forEach(m -> armors.put(m, new Armor(39, EquipmentSlot.HEAD)));
+        Stream.of(LEATHER_CHESTPLATE, CHAINMAIL_CHESTPLATE, GOLDEN_CHESTPLATE, IRON_CHESTPLATE, DIAMOND_CHESTPLATE).forEach(
+                m -> armors.put(m, new Armor(38, EquipmentSlot.CHEST)));
+        Stream.of(LEATHER_LEGGINGS, CHAINMAIL_LEGGINGS, GOLDEN_LEGGINGS, IRON_LEGGINGS, DIAMOND_LEGGINGS).forEach(m -> armors.put(m, new Armor(37, EquipmentSlot.LEGS)));
+        Stream.of(LEATHER_BOOTS, CHAINMAIL_BOOTS, GOLDEN_BOOTS, IRON_BOOTS, DIAMOND_BOOTS).forEach(m -> armors.put(m, new Armor(36, EquipmentSlot.FEET)));
+
+        Stream.of(Material.values()).forEach(m ->
         {
             String name = m.name();
             if(name.contains("GATE"))
@@ -112,74 +90,82 @@ public class ArmorHandler implements Listener
                     //Inventory Holders
                     case CHEST:
                     case TRAPPED_CHEST:
-                    case ENCHANTMENT_TABLE:
+                    case ENCHANTING_TABLE:
                     case ANVIL:
                     case BREWING_STAND:
-                    case WORKBENCH:
+                    case CRAFTING_TABLE:
                     case DISPENSER:
                     case DROPPER:
                     case FURNACE:
-                    case BURNING_FURNACE:
                     case ENDER_CHEST:
                     case BEACON:
                     case HOPPER:
-                    //Bed
-                    case BED:
-                    case BED_BLOCK:
-                    //Redstone related
-                    case WOOD_BUTTON:
+                        //Because Beds are cool
+                    case BLACK_BED:
+                    case BLUE_BED:
+                    case BROWN_BED:
+                    case CYAN_BED:
+                    case GRAY_BED:
+                    case GREEN_BED:
+                    case LIGHT_BLUE_BED:
+                    case LIGHT_GRAY_BED:
+                    case LIME_BED:
+                    case MAGENTA_BED:
+                    case ORANGE_BED:
+                    case PINK_BED:
+                    case PURPLE_BED:
+                    case RED_BED:
+                    case WHITE_BED:
+                    case YELLOW_BED:
+                        //Redstone related - Buttons are cool either.
+                    case ACACIA_BUTTON:
+                    case BIRCH_BUTTON:
+                    case DARK_OAK_BUTTON:
+                    case JUNGLE_BUTTON:
+                    case OAK_BUTTON:
+                    case SPRUCE_BUTTON:
                     case STONE_BUTTON:
                     case TRIPWIRE_HOOK:
                     case DAYLIGHT_DETECTOR:
-                    case DAYLIGHT_DETECTOR_INVERTED:
-                    case DIODE:
-                    case DIODE_BLOCK_OFF:
-                    case DIODE_BLOCK_ON:
-                    case REDSTONE_COMPARATOR:
-                    case REDSTONE_COMPARATOR_OFF:
-                    case REDSTONE_COMPARATOR_ON:
+                    case REPEATER:
+                    case COMPARATOR:
                         clickable.add(m);
                         break;
                 }
             }
         });
     }
-    
-    @EventHandler(ignoreCancelled=false, priority=EventPriority.HIGHEST)
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
     private void onPlayerArmorInteract(final PlayerInteractEvent e)
     {
-        if(e.getAction()==Action.RIGHT_CLICK_AIR)
+        if(e.getAction() == Action.RIGHT_CLICK_AIR)
         {
             checkInteract(e);
         }
-        else if(e.getAction()==Action.RIGHT_CLICK_BLOCK)
+        else if(e.getAction() == Action.RIGHT_CLICK_BLOCK)
         {
-            if( !e.getPlayer().isSneaking() && isContainer(e.getClickedBlock()))
+            if(!e.getPlayer().isSneaking() && isContainer(e.getClickedBlock()))
             {
                 return;
             }
-            
+
             checkInteract(e);
         }
     }
-    
+
     private void checkInteract(final PlayerInteractEvent e)
     {
         Optional.ofNullable(e.getItem())
                 .map(ItemStack::getType)
-                .filter(m -> m != Material.SKULL_ITEM)
-                .flatMap(m -> Optional.ofNullable(armors.get(m)))
+                .filter(m -> !HEADS.contains(m))
+                .map(m -> armors.get(m)) //If is ofNullable, already check every map to be not null.
                 .filter(armor -> getSlot(e.getPlayer().getEquipment(), armor.getEquipmentSlot()) == null)
-                .ifPresent(armor -> 
-                {
-                    if(Util.callEvent(new ArmorEquipEvent(e.getPlayer(), e.getItem(), armor.getEquipmentSlot())).isCancelled())
-                    {
-                        e.setCancelled(true);
-                    }
-                });
+                .map(armor -> new ArmorEquipEvent(e.getPlayer(), e.getItem(), armor.getEquipmentSlot()))
+                .ifPresent(Util::callEvent);
     }
-    
-    @EventHandler(ignoreCancelled=false, priority=EventPriority.LOWEST)
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     private void onPlayerClickEquip(final InventoryClickEvent e)
     {/*
         Bukkit.getLogger().info("=====================");
@@ -198,11 +184,11 @@ public class ArmorHandler implements Listener
         Bukkit.getLogger().info("HotbarSlot: "+Integer.toString(e.getHotbarButton()));
         Bukkit.getLogger().info("=====================");
         */
-        if(e.getInventory().getType()!=InventoryType.CRAFTING)
+        if(e.getInventory().getType() != InventoryType.CRAFTING)
         {
             return;
         }
-        
+
         switch(e.getSlotType())
         {
             case QUICKBAR:
@@ -210,19 +196,14 @@ public class ArmorHandler implements Listener
                 switch(e.getAction())
                 {
                     case MOVE_TO_OTHER_INVENTORY:
-                        if(e.getCurrentItem().getType()!=Material.AIR)
+                        if(e.getCurrentItem().getType() != Material.AIR)
                         {
                             if(Util.or(e.getClick(), ClickType.SHIFT_LEFT, ClickType.SHIFT_RIGHT))
                             {
                                 Optional.ofNullable(armors.get(e.getCurrentItem().getType()))
-                                        .filter(armor -> getSlot(e.getWhoClicked().getEquipment(), armor.getEquipmentSlot())==null)
-                                        .ifPresent(armor -> 
-                                        {
-                                            if(Util.callEvent(new ArmorEquipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), armor.getEquipmentSlot())).isCancelled())
-                                            {
-                                                e.setCancelled(true);
-                                            }
-                                        }); 
+                                        .filter(armor -> getSlot(e.getWhoClicked().getEquipment(), armor.getEquipmentSlot()) == null)
+                                        .map(armor -> new ArmorEquipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), armor.getEquipmentSlot()))
+                                        .ifPresent(Util::callEvent);
                             }
                         }
                         break;
@@ -233,97 +214,73 @@ public class ArmorHandler implements Listener
                 {
                     case DROP_ONE_SLOT:
                     case DROP_ALL_SLOT:
-                        if(Util.callEvent(new ArmorUnequipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.DROP)).isCancelled())
-                        {
-                            e.setCancelled(true);
-                        }
+                        Util.callEvent(new ArmorUnequipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.DROP));
                         break;
                     case MOVE_TO_OTHER_INVENTORY:
                     case PICKUP_ALL:
                     case PICKUP_HALF:
                     case PICKUP_ONE:
-                        if(Util.callEvent(new ArmorUnequipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL)).isCancelled())
-                        {
-                            e.setCancelled(true);
-                        }
+                        new ArmorUnequipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL);
                         break;
                     case PLACE_ALL:
                     case PLACE_ONE:
                     case PLACE_SOME:
                         Optional.of(e.getCursor())
                                 .map(ItemStack::getType)
-                                .filter(m -> m!=Material.AIR)
+                                .filter(m -> m != Material.AIR)
                                 .flatMap(m -> Optional.ofNullable(armors.get(m)))
-                                .filter(armor -> armor.getSlot()==e.getSlot())
-                                .ifPresent(armor -> 
-                                {
-                                    if(Util.callEvent(new ArmorEquipEvent((Player)e.getWhoClicked(), e.getCursor(), armor.getEquipmentSlot())).isCancelled())
-                                    {
-                                        e.setCancelled(true);
-                                    }
-                                });
+                                .filter(armor -> armor.getSlot() == e.getSlot())
+                                .ifPresent(armor -> new ArmorEquipEvent((Player) e.getWhoClicked(), e.getCursor(), armor.getEquipmentSlot()));
                         break;
                     case SWAP_WITH_CURSOR:
-                        if(e.getCursor().getType()==Material.AIR && e.getCurrentItem().getType()!=Material.AIR)
+                        if(e.getCursor().getType() == Material.AIR && e.getCurrentItem().getType() != Material.AIR)
                         {
-                            if(Util.callEvent(new ArmorUnequipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL)).isCancelled())
-                            {
-                                e.setCancelled(true);
-                            }
+                            new ArmorUnequipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL);
                         }
                         else
                         {
-                            Cancellable un = Util.callEvent(new ArmorUnequipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL));
-                            Cancellable eq = Util.callEvent(new ArmorEquipEvent((Player)e.getWhoClicked(), e.getCursor(), slots.get(e.getSlot())));
-                            if(un.isCancelled() || eq.isCancelled())
-                            {
-                                e.setCancelled(true);
-                            }
+                            new ArmorUnequipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL);
+                            new ArmorEquipEvent((Player) e.getWhoClicked(), e.getCursor(), slots.get(e.getSlot()));
                         }
                         break;
-                    case HOTBAR_SWAP:                    
+                    case HOTBAR_SWAP:
                         if(e.getCurrentItem().getType() != Material.AIR)
                         {
-                            e.setCancelled(Util.callEvent(new ArmorUnequipEvent((Player)e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL)).isCancelled());
+                            Util.callEvent(new ArmorUnequipEvent((Player) e.getWhoClicked(), e.getCurrentItem(), slots.get(e.getSlot()), Cause.NORMAL));
                         }
-                        
-                        Optional.ofNullable(e.getWhoClicked().getInventory().getItem(e.getHotbarButton())).ifPresent(item -> 
+
+                        Optional.ofNullable(e.getWhoClicked().getInventory().getItem(e.getHotbarButton())).ifPresent(item ->
                         {
                             Armor armor = armors.get(item.getType());
                             if(armor != null && slots.get(e.getSlot()) == armor.getEquipmentSlot())
                             {
-                                e.setCancelled(Util.callEvent(new ArmorEquipEvent((Player)e.getWhoClicked(), item, armor.getEquipmentSlot())).isCancelled());
+                                Util.callEvent(new ArmorEquipEvent((Player) e.getWhoClicked(), item, armor.getEquipmentSlot()));
                             }
                         });
                 }
         }
     }
-    
-    
-    @EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
+
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onInventoryDrag(final InventoryDragEvent e)
     {
-        if(e.getInventory().getType()==InventoryType.CRAFTING)
+        if(e.getInventory().getType() == InventoryType.CRAFTING)
         {
-            for(Map.Entry<Integer, ItemStack> entry : e.getNewItems().entrySet()) 
-            {   
+            for(Map.Entry<Integer, ItemStack> entry : e.getNewItems().entrySet())
+            {
                 if(e.isCancelled())
                 {
                     return;
                 }
-                
-                Optional.ofNullable(rawSlots.get(entry.getKey())).ifPresent(slot -> 
-                {
-                    if(Util.callEvent(new ArmorEquipEvent((Player)e.getWhoClicked(), entry.getValue(), slot)).isCancelled())
-                    {
-                        e.setCancelled(true);
-                    }
-                });
+
+                Optional.ofNullable(rawSlots.get(entry.getKey()))
+                        .ifPresent(slot -> Util.callEvent(new ArmorEquipEvent((Player) e.getWhoClicked(), entry.getValue(), slot)));
             }
         }
     }
-    
-    @EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onItemDamage(final PlayerItemDamageEvent e)
     {
         ItemStack[] armorArray = e.getPlayer().getInventory().getArmorContents();
@@ -334,7 +291,7 @@ public class ArmorHandler implements Listener
             {
                 continue;
             }
-            
+
             EquipmentSlot slot = null;
             switch(i)
             {
@@ -351,42 +308,33 @@ public class ArmorHandler implements Listener
                     slot = EquipmentSlot.HEAD;
                     break;
             }
-            
-            if(e.getItem().getDurability() + e.getDamage() >= e.getItem().getType().getMaxDurability())
+
+            ItemMeta meta = e.getItem().getItemMeta();
+
+            if(meta instanceof Damageable && ((Damageable) meta).getDamage() + e.getDamage() >= e.getItem().getType().getMaxDurability())
             {
-                e.setCancelled(Util.callEvent(new ArmorUnequipEvent(e.getPlayer(), item, slot, Cause.BREAK)).isCancelled());
+                Util.callEvent(new ArmorUnequipEvent(e.getPlayer(), item, slot, Cause.BREAK));
             }
             return;
         }
     }
-    
-    @EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onPlayerDeath(final PlayerDeathEvent e)
     {
         if(!e.getKeepInventory())
         {
-            slots.values().stream().forEach(slot -> 
+            slots.values().stream().forEach(slot ->
             {
-                ItemStack item=getSlot(e.getEntity().getEquipment(), slot);
-                if(item!=null && Util.callEvent(new ArmorUnequipEvent(e.getEntity(), item, slot, Cause.DEATH)).isCancelled())
+                ItemStack item = getSlot(e.getEntity().getEquipment(), slot);
+                if(item != null)
                 {
-                    e.getDrops().remove(item);
-                    e.getEntity().setMetadata(slot.name(), new FixedMetadataValue(JavaPlugin.getProvidingPlugin(ArmorHandler.class), item));
+                    Util.callEvent(new ArmorUnequipEvent(e.getEntity(), item, slot, Cause.DEATH));
                 }
             });
         }
     }
-    
-    @EventHandler(ignoreCancelled=true, priority=EventPriority.HIGHEST)
-    private void onPlayerRespawn(final PlayerRespawnEvent e)
-    {
-        slots.values().stream().filter(slot -> e.getPlayer().hasMetadata(slot.name())).forEach(slot -> 
-        {
-            setSlot(e.getPlayer().getInventory(), (ItemStack)e.getPlayer().getMetadata(slot.name()).get(0).value(), slot);
-            e.getPlayer().removeMetadata(slot.name(), JavaPlugin.getProvidingPlugin(ArmorHandler.class));
-        });
-    }
-    
+
     private ItemStack getSlot(final EntityEquipment equip, final EquipmentSlot slot)
     {
         switch(slot)
@@ -399,11 +347,13 @@ public class ArmorHandler implements Listener
                 return equip.getLeggings();
             case FEET:
                 return equip.getBoots();
-            default:
-                return null;
+            case HAND:
+                return equip.getItemInMainHand();
+            default: //The last one is offhand.
+                return equip.getItemInOffHand();
         }
     }
-    
+
     public void setSlot(final PlayerInventory i, final ItemStack item, final EquipmentSlot slot)
     {
         switch(slot)
@@ -422,33 +372,34 @@ public class ArmorHandler implements Listener
                 break;
         }
     }
-    
+
     private static boolean isContainer(final Block b)
     {
         Material type = b.getType();
         if(type == Material.JUKEBOX)
         {
-            return ((Jukebox)b.getState()).getPlaying() != Material.AIR;
+            return ((Jukebox) b.getState()).getPlaying() != Material.AIR;
         }
-        
+
         return clickable.contains(type);
     }
-    
+
     private final static class Armor
     {
         private final int slot;
         private final EquipmentSlot eqSlot;
+
         public Armor(final int slot, final EquipmentSlot eqSlot)
         {
-            this.slot=slot;
-            this.eqSlot=eqSlot;
+            this.slot = slot;
+            this.eqSlot = eqSlot;
         }
-        
+
         public int getSlot()
         {
             return slot;
         }
-        
+
         public EquipmentSlot getEquipmentSlot()
         {
             return eqSlot;

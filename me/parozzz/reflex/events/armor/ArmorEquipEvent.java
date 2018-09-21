@@ -6,65 +6,53 @@
 package me.parozzz.reflex.events.armor;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
- *
  * @author Paros
  */
-public class ArmorEquipEvent extends Event implements Cancellable
+public class ArmorEquipEvent extends Event
 {
-    private final Player p;
-    private final EquipmentSlot slot;
-    private final ItemStack item;
-    public ArmorEquipEvent(final Player p, final ItemStack item, final EquipmentSlot slot)
-    {
-        this.p=p;
-        this.slot=slot;
-        this.item=item;
-    }
-    
-    public Player getPlayer()
-    {
-        return p;
-    }
-    
-    public ItemStack getItem()
-    {
-        return item;
-    }
-    
-    public EquipmentSlot getSlot()
-    {
-        return slot;
-    }
-    
-    private static final HandlerList handler=new HandlerList();
-    @Override
-    public HandlerList getHandlers() 
-    {
-        return handler;
-    }
-    
+    private static final HandlerList handler = new HandlerList();
+
     public static HandlerList getHandlerList()
     {
         return handler;
     }
-    
-    private boolean cancelled=false;
-    @Override
-    public boolean isCancelled() 
+
+    private final Player p;
+    private final EquipmentSlot slot;
+    private final ItemStack item;
+
+    public ArmorEquipEvent(final Player p, final ItemStack item, final EquipmentSlot slot)
     {
-        return cancelled;
+        this.p = p;
+        this.slot = slot;
+        this.item = item;
     }
 
-    @Override
-    public void setCancelled(boolean bln) 
+    public Player getPlayer()
     {
-        cancelled=bln;
+        return p;
+    }
+
+    public ItemStack getItem()
+    {
+        return item;
+    }
+
+    public EquipmentSlot getSlot()
+    {
+        return slot;
+    }
+
+
+    @Override
+    public HandlerList getHandlers()
+    {
+        return handler;
     }
 }

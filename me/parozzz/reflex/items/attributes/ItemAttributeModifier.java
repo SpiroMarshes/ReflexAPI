@@ -30,7 +30,7 @@ public final class ItemAttributeModifier
 
     public ItemAttributeModifier(final NMSStackCompound stack)
     {
-        attributeList = stack.getWrapperList("AttributeModifiers", NBTType.COMPOUND);
+        attributeList = stack.getWrappedList("AttributeModifiers", NBTType.COMPOUND);
     }
 
     public Set<ModifierSnapshot> getModifiers(final ItemAttribute attribute)

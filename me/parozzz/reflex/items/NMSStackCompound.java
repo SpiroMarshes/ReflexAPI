@@ -12,6 +12,7 @@ import me.parozzz.reflex.utilities.ReflectionUtil;
 import me.parozzz.reflex.utilities.Util;
 import net.minecraft.server.v1_13_R2.*;
 import org.apache.commons.lang3.Validate;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_13_R2.util.CraftMagicNumbers;
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
 /**
  * @author Paros
  */
-public class NMSStackCompound extends NBTCompound
+public class NMSStackCompound extends NBTCompound implements Itemable
 {
     private final static Field getHandle = ReflectionUtil.getField(CraftItemStack.class, "handle");
 
@@ -47,8 +48,15 @@ public class NMSStackCompound extends NBTCompound
 
     public NMSStackCompound(final org.bukkit.inventory.ItemStack itemStack)
     {
-        bukkitMaterial = itemStack.getType();
-        if(bukkitMaterial == org.bukkit.Material.AIR)
+        if(itemStack == null)
+        {
+            bukkitMaterial = Material.AIR;
+
+            nmsStack = ItemStack.a;
+            isUpdateNeeded = false;
+            return;
+        }
+        else if((bukkitMaterial = itemStack.getType()) == org.bukkit.Material.AIR)
         {
             nmsStack = ItemStack.a;
             isUpdateNeeded = false;
@@ -59,6 +67,11 @@ public class NMSStackCompound extends NBTCompound
 
         nmsStack = isUpdateNeeded ? CraftItemStack.asNMSCopy(itemStack) : getHandle((CraftItemStack) itemStack);
         setCompound(nmsStack.getOrCreateTag());
+    }
+
+    public NMSStackCompound(final NBTCompound serializedItemStack)
+    {
+        this(ItemStack.a(serializedItemStack.getBase()));
     }
 
     public NMSStackCompound(final ItemStack nmsStack)
@@ -418,6 +431,7 @@ public class NMSStackCompound extends NBTCompound
         setCompound(nmsStack.getOrCreateTag());
     }
 
+    @Override
     public org.bukkit.inventory.ItemStack getItemStack()
     {
         return CraftItemStack.asCraftMirror(nmsStack);

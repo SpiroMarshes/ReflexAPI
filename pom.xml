@@ -59,10 +59,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
+        <!--<repository>
             <id>destroystokyo-repo</id>
             <url>https://repo.destroystokyo.com/repository/maven-public//</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>dmulloy2-repo</id>
             <url>http://repo.dmulloy2.net/nexus/repository/public/</url>
@@ -79,14 +79,14 @@
         </dependency>
 
         <!--Paperclip API -->
-        <dependency>
+        <!-- <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.13.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
+        </dependency> -->
 
-        <!--Spigot API and NMS -->
+        <!--Spigot API and nms -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>

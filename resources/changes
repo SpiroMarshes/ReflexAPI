@@ -6,3 +6,8 @@ In Item Creation:
   - Removed spawn egg (No needed, since 1.13 has spawn eggs as peculiar materials)
   - Removed data from all the items, only for tools. In Damageable meta -> "data" to "damage".
   - Added repair cost. In repairable meta -> "repair_cost"
+  #################################################################################
+  - Temporaly removed all the NMS stuff, like item attribute and adventure tags.
+  #################################################################################
+
+- Updated Item Attribute Modifier classes.

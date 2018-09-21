@@ -5,6 +5,15 @@
  */
 package me.parozzz.reflex;
 
+import me.parozzz.reflex.builders.firework.FireworkBuilderListener;
+import me.parozzz.reflex.events.ArmorHandler;
+import me.parozzz.reflex.events.wrappers.EventWrapperListener;
+import me.parozzz.reflex.gui.GuiListener;
+import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -12,71 +21,75 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import me.parozzz.reflex.nms.entity.EntityPlayer;
-import me.parozzz.reflex.events.ArmorHandler;
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
-
 /**
- *
  * @author Paros
  */
 public class ReflexAPI extends JavaPlugin
 {
     public enum Property
     {
-        ENTITYPLAYER_LISTENER, ARMOREVENTS_LISTENER;
+        ARMOREVENTS_LISTENER, GUI_LISTENER, FIREWORK_BUILDER_LISTENER, WRAPPED_EVENTS;
     }
-    
+
     public static ReflexAPI getAPI()
     {
         return JavaPlugin.getPlugin(ReflexAPI.class);
     }
-    
+
     private static final Logger logger = Logger.getLogger(ReflexAPI.class.getSimpleName());
+
     public static Logger logger()
     {
         return logger;
     }
-    
-    
+
+    private Set<Property> propertySet;
+
     @Override
     public void onEnable()
     {
-        getDataFolder().mkdir();
+        propertySet = new HashSet<>();
     }
-    
-    private DatabaseManager database;
-    public DatabaseManager getDatabase()
+
+    @Override
+    public void onDisable()
     {
-        return Optional.ofNullable(database).orElseGet(() -> database = new DatabaseManager(this));
+        Bukkit.getScheduler().cancelTasks(this);
+        HandlerList.unregisterAll(this);
     }
-    
-    private final Set<Property> registered = new HashSet<>();
+
     public void addProperty(final Property... properties)
     {
-        Stream.of(properties).forEach(property -> 
+        Stream.of(properties).filter(propertySet::add).forEach(property ->
         {
-            if(!registered.add(property))
+            try
             {
-                return;
-            }
-            
-            try {
                 switch(property)
                 {
-                    case ENTITYPLAYER_LISTENER:
-                        Bukkit.getPluginManager().registerEvents((Listener)ReflectionUtil.getMethod(EntityPlayer.class, "getListener").invoke(null), this);
+                    case WRAPPED_EVENTS:
+                        registerListener(new EventWrapperListener());
                         break;
                     case ARMOREVENTS_LISTENER:
-                        Bukkit.getPluginManager().registerEvents(new ArmorHandler(), this);
+                        registerListener(new ArmorHandler());
+                        break;
+                    case GUI_LISTENER:
+                        registerListener(new GuiListener());
+                        break;
+                    case FIREWORK_BUILDER_LISTENER:
+                        registerListener(new FireworkBuilderListener());
                         break;
                 }
-            }catch(final Exception ex){
-                Logger.getLogger(ReflexAPI.class.getSimpleName()).log(Level.SEVERE, null, ex);
+            }
+            catch(final Exception ex)
+            {
+                Logger.getLogger(ReflexAPI.class.getSimpleName()).log(Level.SEVERE, "An error trying to initialize a Listener from a property.", ex);
             }
 
         });
+    }
+
+    private void registerListener(Listener listener)
+    {
+        Bukkit.getPluginManager().registerEvents(listener, this);
     }
 }

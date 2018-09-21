@@ -30,49 +30,6 @@ public class TaskUtil
 {
     /**
      * 
-     * @param delay - The initial delay of the delayed runnable
-     * @param timer - The timer of the runnable
-     * @param runnable - The action to accomplish. If return true, the timed runnable is cancelled.
-     * @return - The bukkitTask of the runnable
-     */
-    public static BukkitTask scheduleSyncTimer(final long delay, final long timer, final Supplier<Boolean> runnable)
-    {
-        return new BukkitRunnable()
-        {
-            @Override
-            public void run() 
-            {
-                if(runnable.get())
-                {
-                    this.cancel();
-                }
-            }
-        }.runTaskTimer(JavaPlugin.getProvidingPlugin(TaskUtil.class), delay, timer);
-    }
-    
-    /**
-     * 
-     * @param delay - The delay of the delayed task
-     * @param runnable - The action to accomplish
-     * @return - The bukkitTask of the runnable
-     */
-    public static BukkitTask scheduleSync(final long delay, final Runnable runnable)
-    {
-        return Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(TaskUtil.class), runnable, delay);
-    }
-    
-    public static BukkitTask scheduleAsync(final Runnable runnable)
-    {
-        return Bukkit.getScheduler().runTaskAsynchronously(JavaPlugin.getProvidingPlugin(TaskUtil.class), runnable);
-    }
-    
-    public static BukkitTask scheduleSync(final Runnable runnable)
-    {
-        return Bukkit.getScheduler().runTask(JavaPlugin.getProvidingPlugin(TaskUtil.class), runnable);
-    }
-    
-    /**
-     * 
      * @param <T> - The type of the collection
      * @param s  - The collection to split
      * @param chunkSize - How much chunks should the collection be splitted

@@ -6,7 +6,10 @@
 package me.parozzz.reflex.utilities;
 
 import org.bukkit.Bukkit;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 /**
  *
@@ -49,4 +52,25 @@ public class InventoryUtil
         }
         return newInv;
     }
+
+
+    public static ItemStack getItem(PlayerInventory inventory, EquipmentSlot slot)
+    {
+        switch(slot)
+        {
+            case HEAD:
+                return inventory.getHelmet();
+            case CHEST:
+                return inventory.getChestplate();
+            case LEGS:
+                return inventory.getLeggings();
+            case FEET:
+                return inventory.getBoots();
+            case HAND:
+                return inventory.getItemInMainHand();
+            default: //The last is the off hand
+                return inventory.getItemInOffHand();
+        }
+    }
+
 }

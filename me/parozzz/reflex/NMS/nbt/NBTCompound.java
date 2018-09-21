@@ -25,7 +25,7 @@ public class NBTCompound implements NBT<NBTTagCompound>
     {
     }
 
-    public final NBTCompound setCompound(final NBTTagCompound tag)
+    protected final NBTCompound setCompound(final NBTTagCompound tag)
     {
         this.tag = tag;
         return this;

@@ -5,14 +5,13 @@
  */
 package me.parozzz.reflex.utilities;
 
-import me.parozzz.reflex.MCVersion;
+import me.parozzz.reflex.items.NMSStackCompound;
 import me.parozzz.reflex.tools.Validator;
 import me.parozzz.reflex.utilities.Util.ColorEnum;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,8 +23,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -33,63 +30,25 @@ import java.util.stream.Collectors;
  */
 public class ItemUtil
 {
-    public static boolean nonNull(final ItemStack item)
+    public static boolean nonAir(final ItemStack item)
     {
         return item != null && item.getType() != Material.AIR;
     }
 
-    private static Predicate<ItemStack> isUnbreakable;
-
-    public static boolean isUnbreakable(final ItemStack item)
+    @Nullable
+    public static NMSStackCompound getStackByPath(ConfigurationSection path)
     {
-        return Optional.ofNullable(isUnbreakable).orElseGet(() ->
-        {
-            if(MCVersion.V1_8.isEqual())
-            {
-                isUnbreakable = i -> false;
-            }
-            else if(MCVersion.contains(MCVersion.V1_9, MCVersion.V1_10))
-            {
-                isUnbreakable = i -> i.getItemMeta().spigot().isUnbreakable();
-            }
-            else
-            {
-                isUnbreakable = i -> i.getItemMeta().isUnbreakable();
-            }
-            return isUnbreakable;
-        }).test(item);
+        ItemStack itemStack = getItemByPath(path);
+        return itemStack == null ? null : new NMSStackCompound(itemStack);
     }
 
-    private static BiConsumer<ItemMeta, Boolean> setUnbreakable;
-
-    public static void setUnbreakable(final ItemMeta meta, final boolean unbreakable)
-    {
-        Optional.ofNullable(setUnbreakable).orElseGet(() ->
-        {
-            if(MCVersion.V1_8.isEqual())
-            {
-                setUnbreakable = (m, b) ->
-                {
-                };
-            }
-            else if(MCVersion.contains(MCVersion.V1_9, MCVersion.V1_10))
-            {
-                setUnbreakable = (m, b) -> m.spigot().setUnbreakable(b);
-            }
-            else
-            {
-                setUnbreakable = (m, b) -> m.setUnbreakable(b);
-            }
-
-            return setUnbreakable;
-        }).accept(meta, unbreakable);
-    }
-
+    @Nullable
     public static ItemStack getItemByPath(final ConfigurationSection path)
     {
         return getItemByPath(null, path);
     }
 
+    @Nullable
     public static ItemStack getItemByPath(@Nullable Material type, final ConfigurationSection path)
     {
         Validate.notNull(type == null && path == null, "Something went really wrong while create a new ItemStack. Please report this.");
